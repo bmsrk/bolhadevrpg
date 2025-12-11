@@ -1,4 +1,4 @@
-import { Attributes, CharacterArchetype, Enemy, Item, Location } from './types';
+import { CharacterArchetype, Enemy, Item, Location } from './types';
 
 export const LOCATIONS: Location[] = [
   {
