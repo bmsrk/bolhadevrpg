@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, memo } from 'react';
 import { GameState, LogEntry } from '../types';
-import { Terminal, Shield, Cpu, Users, Clover, Heart } from 'lucide-react';
+import { Terminal, Cpu, Users, Clover, Heart } from 'lucide-react';
 
-export const LogDisplay = ({ logs }: { logs: LogEntry[] }) => {
+const LogDisplayComponent = ({ logs }: { logs: LogEntry[] }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,8 +28,10 @@ export const LogDisplay = ({ logs }: { logs: LogEntry[] }) => {
     </div>
   );
 };
+LogDisplayComponent.displayName = 'LogDisplay';
+export const LogDisplay = memo(LogDisplayComponent);
 
-export const StatsSidebar = ({ gameState }: { gameState: GameState }) => {
+const StatsSidebarComponent = ({ gameState }: { gameState: GameState }) => {
   const { player } = gameState;
   if (!player.archetype) return null;
 
@@ -105,6 +107,8 @@ export const StatsSidebar = ({ gameState }: { gameState: GameState }) => {
     </div>
   );
 };
+StatsSidebarComponent.displayName = 'StatsSidebar';
+export const StatsSidebar = memo(StatsSidebarComponent);
 
 interface ActionButtonProps {
   onClick: () => void;
@@ -113,7 +117,7 @@ interface ActionButtonProps {
   disabled?: boolean;
 }
 
-export const ActionButton: React.FC<ActionButtonProps> = ({ onClick, label, subtext, disabled }) => (
+const ActionButtonComponent: React.FC<ActionButtonProps> = ({ onClick, label, subtext, disabled }) => (
   <button
     onClick={onClick}
     disabled={disabled}
@@ -131,3 +135,5 @@ export const ActionButton: React.FC<ActionButtonProps> = ({ onClick, label, subt
     </div>
   </button>
 );
+ActionButtonComponent.displayName = 'ActionButton';
+export const ActionButton = memo(ActionButtonComponent);

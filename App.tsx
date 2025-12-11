@@ -5,6 +5,13 @@ import { LogDisplay, StatsSidebar, ActionButton } from './components/TerminalUI'
 import { rollDice, resolveCombatRound } from './utils/dice';
 import { Terminal, Play, Skull, Trophy } from 'lucide-react';
 
+// Attribute mapping for combat actions - defined as constant to avoid recreating
+const ATTRIBUTE_MAP = {
+  'WIT': 'Wit',
+  'CRAFT': 'Craft',
+  'SOCIAL': 'Social'
+} as const;
+
 const INITIAL_STATE: GameState = {
   screen: 'START',
   player: {
@@ -93,10 +100,10 @@ const App = () => {
     }));
   };
 
-  const handleCombatAction = (actionType: 'WIT' | 'CRAFT' | 'SOCIAL') => {
+  const handleCombatAction = useCallback((actionType: 'WIT' | 'CRAFT' | 'SOCIAL') => {
     if (!gameState.currentEnemy || !gameState.player.archetype) return;
 
-    const playerAttr = gameState.player.attributes[actionType === 'WIT' ? 'Wit' : actionType === 'CRAFT' ? 'Craft' : 'Social'];
+    const playerAttr = gameState.player.attributes[ATTRIBUTE_MAP[actionType]];
     // Enemy defends with random attribute for simplicity or specific
     const enemyDef = 2; 
 
@@ -147,41 +154,42 @@ const App = () => {
       return;
     }
 
-    // Enemy Turn
-    setTimeout(() => {
-        if (!gameState.currentEnemy) return; // safety
-        const enemyAttack = gameState.currentEnemy.stats.Wit > gameState.currentEnemy.stats.Craft ? 'Wit' : 'Craft'; // Simplified logic
-        const enemyAbility = gameState.currentEnemy.abilities[Math.floor(Math.random() * gameState.currentEnemy.abilities.length)];
-        
-        addLog(`${gameState.currentEnemy.name} usa "${enemyAbility}"!`, 'combat', 'ENEMY');
-        
-        const enemyRoll = rollDice(gameState.currentEnemy.stats[enemyAttack as keyof typeof gameState.currentEnemy.stats] || 3);
-        const playerDefRoll = rollDice(gameState.player.attributes.Wit); // Defend with Wit usually
-        
-        const dmgTaken = Math.max(0, enemyRoll.successes - playerDefRoll.successes);
-        
-        addLog(`Defesa: ${playerDefRoll.message} vs Atk: ${enemyRoll.message}`, 'system');
-
-        if (dmgTaken > 0) {
-            addLog(`Você perdeu ${dmgTaken} de Sanidade!`, 'failure');
-            setGameState(prev => {
-                const newHp = prev.player.hp - dmgTaken;
-                if (newHp <= 0) {
-                    return { ...prev, player: { ...prev.player, hp: 0 }, screen: 'GAME_OVER' };
-                }
-                return { ...prev, currentEnemy: { ...prev.currentEnemy!, hp: newEnemyHp }, player: { ...prev.player, hp: newHp } };
-            });
-        } else {
-            addLog("Você tankou o ataque com sua indiferença cínica.", 'info');
-             setGameState(prev => ({ ...prev, currentEnemy: { ...prev.currentEnemy!, hp: newEnemyHp } }));
-        }
-    }, 1000);
-    
-    // Optimistic update for enemy HP while waiting for turn
+    // Optimistic update for enemy HP before enemy turn
     setGameState(prev => ({ ...prev, currentEnemy: { ...prev.currentEnemy!, hp: newEnemyHp } }));
-  };
+
+    // Enemy Turn (delayed for better UX)
+    setTimeout(() => {
+        setGameState(prev => {
+          if (!prev.currentEnemy) return prev; // safety check
+          
+          const enemyAttack = prev.currentEnemy.stats.Wit > prev.currentEnemy.stats.Craft ? 'Wit' : 'Craft';
+          const enemyAbility = prev.currentEnemy.abilities[Math.floor(Math.random() * prev.currentEnemy.abilities.length)];
+          
+          addLog(`${prev.currentEnemy.name} usa "${enemyAbility}"!`, 'combat', 'ENEMY');
+          
+          const enemyRoll = rollDice(prev.currentEnemy.stats[enemyAttack] || 3);
+          const playerDefRoll = rollDice(prev.player.attributes.Wit);
+          
+          const dmgTaken = Math.max(0, enemyRoll.successes - playerDefRoll.successes);
+          
+          addLog(`Defesa: ${playerDefRoll.message} vs Atk: ${enemyRoll.message}`, 'system');
+
+          if (dmgTaken > 0) {
+              addLog(`Você perdeu ${dmgTaken} de Sanidade!`, 'failure');
+              const newHp = prev.player.hp - dmgTaken;
+              if (newHp <= 0) {
+                  return { ...prev, player: { ...prev.player, hp: 0 }, screen: 'GAME_OVER' };
+              }
+              return { ...prev, currentEnemy: { ...prev.currentEnemy, hp: newEnemyHp }, player: { ...prev.player, hp: newHp } };
+          } else {
+              addLog("Você tankou o ataque com sua indiferença cínica.", 'info');
+              return { ...prev, currentEnemy: { ...prev.currentEnemy, hp: newEnemyHp } };
+          }
+        });
+    }, 1000);
+  }, [gameState.currentEnemy, gameState.player, gameState.questProgress, addLog]);
   
-  const flee = () => {
+  const flee = useCallback(() => {
       addLog("Você tentou fugir da discussão...", 'info');
       if (Math.random() > 0.5) {
           addLog("Sucesso! Você mutou a thread.", 'success');
@@ -189,9 +197,9 @@ const App = () => {
       } else {
           addLog("Falha! Eles te marcaram no 'quote tweet'.", 'failure');
           // Take minor damage
-          setGameState(prev => ({...prev, player: {...prev.player, hp: prev.player.hp - 1}}));
+          setGameState(prev => ({...prev, player: {...prev.player, hp: Math.max(0, prev.player.hp - 1)}}));
       }
-  };
+  }, [addLog]);
 
   // --- Rendering Content based on State ---
 
