@@ -6,7 +6,8 @@ export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     return {
       // Set base path for GitHub Pages deployment
-      // Will be '/' for local dev, '/bolhadevrpg/' for GitHub Pages
+      // For GitHub Pages: https://<username>.github.io/<repo-name>/
+      // Update 'bolhadevrpg' if repository name changes
       base: mode === 'production' ? '/bolhadevrpg/' : '/',
       server: {
         port: 3000,

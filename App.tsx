@@ -5,6 +5,13 @@ import { LogDisplay, StatsSidebar, ActionButton } from './components/TerminalUI'
 import { rollDice, resolveCombatRound } from './utils/dice';
 import { Terminal, Play, Skull, Trophy } from 'lucide-react';
 
+// Attribute mapping for combat actions - defined as constant to avoid recreating
+const ATTRIBUTE_MAP = {
+  'WIT': 'Wit',
+  'CRAFT': 'Craft',
+  'SOCIAL': 'Social'
+} as const;
+
 const INITIAL_STATE: GameState = {
   screen: 'START',
   player: {
@@ -96,8 +103,7 @@ const App = () => {
   const handleCombatAction = useCallback((actionType: 'WIT' | 'CRAFT' | 'SOCIAL') => {
     if (!gameState.currentEnemy || !gameState.player.archetype) return;
 
-    const attributeMap = { 'WIT': 'Wit', 'CRAFT': 'Craft', 'SOCIAL': 'Social' } as const;
-    const playerAttr = gameState.player.attributes[attributeMap[actionType]];
+    const playerAttr = gameState.player.attributes[ATTRIBUTE_MAP[actionType]];
     // Enemy defends with random attribute for simplicity or specific
     const enemyDef = 2; 
 
@@ -148,8 +154,11 @@ const App = () => {
       return;
     }
 
+    // Optimistic update for enemy HP before enemy turn
+    setGameState(prev => ({ ...prev, currentEnemy: { ...prev.currentEnemy!, hp: newEnemyHp } }));
+
     // Enemy Turn (delayed for better UX)
-    const enemyTurnTimer = setTimeout(() => {
+    setTimeout(() => {
         setGameState(prev => {
           if (!prev.currentEnemy) return prev; // safety check
           
@@ -178,12 +187,6 @@ const App = () => {
           }
         });
     }, 1000);
-    
-    // Cleanup timer on component unmount
-    return () => clearTimeout(enemyTurnTimer);
-    
-    // Optimistic update for enemy HP while waiting for turn
-    setGameState(prev => ({ ...prev, currentEnemy: { ...prev.currentEnemy!, hp: newEnemyHp } }));
   }, [gameState.currentEnemy, gameState.player, gameState.questProgress, addLog]);
   
   const flee = useCallback(() => {
