@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { GameState, LogEntry, CharacterArchetype, Enemy, Location } from './types';
 import { ARCHETYPES, LOCATIONS, ENEMIES, ITEMS } from './constants';
 import { LogDisplay, StatsSidebar, ActionButton } from './components/TerminalUI';
@@ -65,7 +65,7 @@ const App = () => {
     addLog("MISSÃO: Uma feature crítica precisa ir pro ar. O CI está vermelho. Boa sorte.", 'system');
   };
 
-  const moveLocation = (location: Location) => {
+  const moveLocation = useCallback((location: Location) => {
     // 30% chance of encounter when moving
     const encounterRoll = Math.random();
     let nextScreen: GameState['screen'] = 'EXPLORE';
@@ -98,7 +98,7 @@ const App = () => {
       currentLocation: location,
       currentEnemy: enemy
     }));
-  };
+  }, [addLog]);
 
   const handleCombatAction = useCallback((actionType: 'WIT' | 'CRAFT' | 'SOCIAL') => {
     if (!gameState.currentEnemy || !gameState.player.archetype) return;
@@ -277,8 +277,20 @@ const App = () => {
     }
   };
 
+  const handleRest = useCallback(() => {
+    const heal = Math.ceil(Math.random() * 3);
+    setGameState(prev => ({...prev, player: {...prev.player, hp: Math.min(prev.player.maxHp, prev.player.hp + heal)}}));
+    addLog(`Você scrollou a timeline. Recuperou ${heal} de Sanidade.`, 'success');
+  }, [addLog]);
+
+  // Memoize enemy max HP lookup
+  const enemyMaxHp = useMemo(() => {
+    if (!gameState.currentEnemy) return 0;
+    return ENEMIES.find(e => e.id === gameState.currentEnemy?.id)?.hp || 0;
+  }, [gameState.currentEnemy?.id]);
+
   // --- Dynamic Action Buttons ---
-  const getActions = () => {
+  const getActions = useMemo(() => {
       if (gameState.screen === 'EXPLORE') {
           return (
               <>
@@ -287,23 +299,20 @@ const App = () => {
                     <ActionButton key={loc.id} label={`Ir para ${loc.name}`} onClick={() => moveLocation(loc)} subtext="Mover" />
                 ))}
                 <div className="text-xs text-gray-500 mt-4 mb-2 uppercase tracking-widest">System</div>
-                <ActionButton label="Checar Twitter (Rest)" onClick={() => {
-                    const heal = Math.ceil(Math.random() * 3);
-                    setGameState(prev => ({...prev, player: {...prev.player, hp: Math.min(prev.player.maxHp, prev.player.hp + heal)}}));
-                    addLog(`Você scrollou a timeline. Recuperou ${heal} de Sanidade.`, 'success');
-                }} subtext="Recuperar HP" />
+                <ActionButton label="Checar Twitter (Rest)" onClick={handleRest} subtext="Recuperar HP" />
               </>
           );
       }
       
       if (gameState.screen === 'COMBAT') {
+          const enemyHpPercent = gameState.currentEnemy ? (gameState.currentEnemy.hp / enemyMaxHp) * 100 : 0;
           return (
               <>
                 <div className="text-xs text-red-500 mb-2 uppercase tracking-widest animate-pulse">COMBAT MODE</div>
                 <div className="mb-4 p-2 border border-red-900 bg-red-900/10">
                     <p className="text-red-400 font-bold">{gameState.currentEnemy?.name}</p>
                     <div className="w-full bg-red-900/30 h-2 mt-1">
-                         <div className="bg-red-500 h-full" style={{width: `${(gameState.currentEnemy!.hp / ENEMIES.find(e => e.id === gameState.currentEnemy?.id)!.hp) * 100}%`}}></div>
+                         <div className="bg-red-500 h-full" style={{width: `${enemyHpPercent}%`}}></div>
                     </div>
                 </div>
                 
@@ -317,7 +326,7 @@ const App = () => {
           );
       }
       return null;
-  };
+  }, [gameState.screen, gameState.currentLocation.id, gameState.currentEnemy, gameState.player.attributes, enemyMaxHp, moveLocation, handleRest, handleCombatAction, flee]);
 
   return (
     <div className="flex flex-col h-screen w-full bg-black text-green-500 font-mono relative overflow-hidden">
@@ -361,7 +370,7 @@ const App = () => {
                     <div className="hidden md:flex flex-col">
                         <StatsSidebar gameState={gameState} />
                         <div className="w-64 border-l border-green-900 bg-black/90 p-4 overflow-y-auto flex-1 border-t border-green-800">
-                             {getActions()}
+                             {getActions}
                         </div>
                     </div>
                 </>
@@ -372,7 +381,7 @@ const App = () => {
         {(gameState.screen === 'EXPLORE' || gameState.screen === 'COMBAT') && (
             <div className="md:hidden border-t-2 border-green-800 bg-black p-2 h-1/3 overflow-y-auto z-20">
                 <div className="grid grid-cols-1 gap-2">
-                     {getActions()}
+                     {getActions}
                 </div>
                 {/* Mini Stat Bar for Mobile */}
                 <div className="mt-4 flex justify-between text-xs border-t border-green-900 pt-2 text-gray-500">

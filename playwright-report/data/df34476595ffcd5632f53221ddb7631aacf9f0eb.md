@@ -1,0 +1,90 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - img [ref=e6]
+      - generic [ref=e8]: BOLHADEV_OS
+    - generic [ref=e9]: v2.0.4-rc1 // COMBAT
+  - generic [ref=e10]:
+    - generic [ref=e11]:
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - generic [ref=e14]: "[GAME]"
+          - text: Inicializando BOLHADEV_OS v2.0...
+        - generic [ref=e15]:
+          - generic [ref=e16]: "[GAME]"
+          - text: Detectado novo usuário. Selecione seu arquétipo de sofrimento.
+        - generic [ref=e17]:
+          - generic [ref=e18]: "[GAME]"
+          - text: Arquétipo The Maintainer selecionado.
+        - generic [ref=e19]:
+          - generic [ref=e20]: "[GAME]"
+          - text: Bem-vindo ao Hashtag Plaza. O centro da cidade. Tudo viraliza ou morre aqui. O chão é coberto de hot takes descartadas.
+        - generic [ref=e21]:
+          - generic [ref=e22]: "[GAME]"
+          - text: "MISSÃO: Uma feature crítica precisa ir pro ar. O CI está vermelho. Boa sorte."
+        - generic [ref=e23]:
+          - generic [ref=e24]: "[GAME]"
+          - text: "ALERTA: Paladino do Legado bloqueia o caminho!"
+        - generic [ref=e25]:
+          - generic [ref=e26]: "[Paladino do Legado]"
+          - text: "\"Carrega um servidor Windows Server 2003 nas costas.\""
+      - generic [ref=e27]:
+        - generic [ref=e28]: ">"
+        - generic [ref=e29]: _█
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - generic [ref=e32]:
+          - heading "The Maintainer" [level=2] [ref=e33]
+          - paragraph [ref=e34]: Lvl 1 Dev
+        - generic [ref=e35]:
+          - generic [ref=e37]:
+            - generic [ref=e38]:
+              - img [ref=e39]
+              - text: SANITY (HP)
+            - generic [ref=e41]: 20/20
+          - generic [ref=e45]:
+            - generic [ref=e46]:
+              - img [ref=e47]
+              - text: FOLLOWERS
+            - generic [ref=e52]: "100"
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - img [ref=e55]
+              - generic [ref=e57]: "WIT: 2"
+            - generic [ref=e58]:
+              - img [ref=e59]
+              - generic [ref=e62]: "CRAFT: 4"
+            - generic [ref=e63]:
+              - img [ref=e64]
+              - generic [ref=e69]: "SOC: 1"
+            - generic [ref=e70]:
+              - img [ref=e71]
+              - generic [ref=e75]: "LUCK: 1"
+          - generic [ref=e76]:
+            - heading "INVENTORY" [level=3] [ref=e77]
+            - list [ref=e78]:
+              - listitem [ref=e79]: Mochila vazia...
+          - 'heading "QUEST: SALVAR RELEASE" [level=3] [ref=e81]'
+      - generic [ref=e83]:
+        - generic [ref=e84]: COMBAT MODE
+        - paragraph [ref=e86]: Paladino do Legado
+        - button "> Argumentar (Wit) Roll 2d6" [ref=e89] [cursor=pointer]:
+          - generic [ref=e90]:
+            - generic [ref=e91]: "> Argumentar (Wit)"
+            - generic [ref=e92]: Roll 2d6
+        - button "> Refatorar (Craft) Roll 4d6" [ref=e93] [cursor=pointer]:
+          - generic [ref=e94]:
+            - generic [ref=e95]: "> Refatorar (Craft)"
+            - generic [ref=e96]: Roll 4d6
+        - button "> Ratio / Cancelar (Social) Roll 1d6" [ref=e97] [cursor=pointer]:
+          - generic [ref=e98]:
+            - generic [ref=e99]: "> Ratio / Cancelar (Social)"
+            - generic [ref=e100]: Roll 1d6
+        - button "> Mutar Thread (Fugir) Chance de falha" [ref=e101] [cursor=pointer]:
+          - generic [ref=e102]:
+            - generic [ref=e103]: "> Mutar Thread (Fugir)"
+            - generic [ref=e104]: Chance de falha
+```
