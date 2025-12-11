@@ -325,7 +325,19 @@ const App = () => {
           );
       }
       return null;
-  }, [gameState.screen, gameState.currentLocation.id, gameState.currentEnemy, gameState.player.attributes, enemyMaxHp, moveLocation, handleRest, handleCombatAction, flee]);
+  }, [
+    gameState.screen, 
+    gameState.currentLocation.id, 
+    gameState.currentEnemy, 
+    gameState.player.attributes.Wit,
+    gameState.player.attributes.Craft,
+    gameState.player.attributes.Social,
+    enemyMaxHp, 
+    moveLocation, 
+    handleRest, 
+    handleCombatAction, 
+    flee
+  ]);
 
   return (
     <div className="flex flex-col h-screen w-full bg-black text-green-500 font-mono relative overflow-hidden">
