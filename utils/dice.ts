@@ -1,4 +1,4 @@
-import { Attributes } from '../types';
+// dice utility functions
 
 export interface RollResult {
   successes: number;

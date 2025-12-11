@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, memo } from 'react';
+import { useEffect, useRef, memo } from 'react';
 import { GameState, LogEntry } from '../types';
 import { Terminal, Cpu, Users, Clover, Heart } from 'lucide-react';
 

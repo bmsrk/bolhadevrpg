@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { GameState, LogEntry, CharacterArchetype, Enemy, Location } from './types';
 import { ARCHETYPES, LOCATIONS, ENEMIES, ITEMS } from './constants';
 import { LogDisplay, StatsSidebar, ActionButton } from './components/TerminalUI';
 import { rollDice, resolveCombatRound } from './utils/dice';
-import { Terminal, Play, Skull, Trophy } from 'lucide-react';
+import { Terminal, Skull, Trophy } from 'lucide-react';
 
 // Attribute mapping for combat actions - defined as constant to avoid recreating
 const ATTRIBUTE_MAP = {
@@ -31,7 +31,6 @@ const INITIAL_STATE: GameState = {
 
 const App = () => {
   const [gameState, setGameState] = useState<GameState>(INITIAL_STATE);
-  const [inputBuffer, setInputBuffer] = useState("");
 
   const addLog = useCallback((text: string, type: LogEntry['type'] = 'info', sender: string = 'GAME') => {
     setGameState(prev => ({
